@@ -75,20 +75,20 @@ end
 %Correlation. Peaks are 245 symb. too late bc of correlation. 
 pamF = letters2pam2(Pre);
 corrDat1 = conv(xs, fliplr(pamF));
-[pks, ind] = findpeaks(abs(corrDat1), 'MinPeakHeight', 1200);
+[pks, ind] = findpeaks(abs(corrDat1), 'MinPeakHeight', 1100);
 
 %Equalizer
 j = 0; 
 eqOut = [];
 eqConv = [];
-n=12; 
+n=22; 
 eqF= zeros(length(ind), n);
 while j< length(ind)
     j = j+1;
     s = pamF; %ideal channel output
     chOut = xs(ind(j)+1-245:ind(j)+244+1-245); %New channel each run. Corrupted Preamble. 
     f=zeros(n,1);           % initialize equalizer at 0
-    mu=.0027; delta=n/2;             % stepsize and delay delta
+    mu=.0029; delta=n/2;             % stepsize and delay delta
     err=[];
     for i=n+1:length(pamF)                 % iterate
       rr=chOut(i:-1:i-n+1)';         % vector of received signal
@@ -112,7 +112,10 @@ end
 
 %CORRELATE round 2 (rob)
 corrDat2 = conv(eqOut, fliplr(pamF));
-[pks, ind2] = findpeaks(abs(corrDat2), 'MinPeakHeight', 1200);
+[MAX, LOC] = max(corrDat2);
+figure(9);
+plot(corrDat2);
+[pks, ind2] = findpeaks(abs(corrDat2), 'MinPeakHeight', MAX*.75);
 
 %Quantize
 quantDat = quantalph(eqOut, [-3, -1, 1, 3]);
